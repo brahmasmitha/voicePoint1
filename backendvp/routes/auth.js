@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -19,11 +20,12 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ message: 'An account with this email already exists.' })
     }
 
-    // NOTE: storing plain text password for now — bcrypt hashing comes in Phase F
-    const newUser = new User({
+//bcrypt
+      const hashedPassword = await bcrypt.hash(password,10)
+      const newUser = new User({
       name,
       email,
-      password,
+      password: hashedPassword,
       role: 'student' // hardcoded, matching our frontend decision
     })
 
@@ -59,7 +61,11 @@ router.post('/login', async (req, res) => {
     }
 
     // Check password matches (plain text comparison for now — bcrypt comes in Phase F)
-    if (user.password !== password) {
+    // if (user.password !== password) {
+    //   return res.status(401).json({ message: 'Invalid email or password.' })
+    // }
+    const passwordMatch = await bcrypt.compare(password, user.password)
+    if (!passwordMatch) {
       return res.status(401).json({ message: 'Invalid email or password.' })
     }
 
