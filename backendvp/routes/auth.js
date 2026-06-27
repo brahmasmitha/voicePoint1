@@ -59,8 +59,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password.' })
     }
-
-    // Check password matches (plain text comparison for now — bcrypt comes in Phase F)
+    
     // if (user.password !== password) {
     //   return res.status(401).json({ message: 'Invalid email or password.' })
     // }
